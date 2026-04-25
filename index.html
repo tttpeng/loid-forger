@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOID FORGER · CODENAME: TWILIGHT</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
+    :root {
+      --gold: #c9a227;
+      --gold-dim: #8a6d10;
+      --bg: #06070d;
+      --bg2: #0d0f1a;
+      --bg3: #111420;
+      --text: #d4d8e8;
+      --text-dim: #5a6080;
+      --red: #e02a2a;
+      --cyan: #0cf;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── Scanlines overlay ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── Particle canvas ─── */
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── Nav ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 3rem;
+      background: rgba(6,7,13,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,162,39,0.15);
+    }
+
+    .nav-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.12em;
+      transition: color 0.3s;
+      text-transform: uppercase;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: #2ec44d;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #2ec44d;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(46,196,77,0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(46,196,77,0); }
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      padding: 6rem 2rem 2rem;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0.8;
+    }
+
+    .hero-name {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: relative;
+    }
+
+    .hero-name .twilight {
+      display: block;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.4em;
+      margin-top: 0.3em;
+    }
+
+    .glitch {
+      position: relative;
+      animation: glitch-clip 6s infinite;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      opacity: 0.7;
+    }
+
+    .glitch::before {
+      color: #ff0044;
+      animation: glitch-r 6s infinite;
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+    }
+
+    .glitch::after {
+      color: #00f0ff;
+      animation: glitch-b 6s infinite;
+      clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+    }
+
+    @keyframes glitch-r {
+      0%, 90%, 100% { transform: translate(0); }
+      92% { transform: translate(-3px, 1px); }
+      94% { transform: translate(3px, -1px); }
+      96% { transform: translate(-2px, 0); }
+    }
+
+    @keyframes glitch-b {
+      0%, 88%, 100% { transform: translate(0); }
+      90% { transform: translate(3px, 2px); }
+      93% { transform: translate(-3px, -1px); }
+      95% { transform: translate(2px, 0); }
+    }
+
+    @keyframes glitch-clip {
+      0%, 89%, 100% { clip-path: none; }
+      90% { clip-path: polygon(0 20%, 100% 20%, 100% 22%, 0 22%); }
+      91% { clip-path: polygon(0 60%, 100% 60%, 100% 63%, 0 63%); }
+      92% { clip-path: none; }
+    }
+
+    .hero-desc {
+      margin-top: 2rem;
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      max-width: 480px;
+      line-height: 1.8;
+    }
+
+    .hero-desc strong { color: var(--text); }
+
+    .hero-cta {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.8rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+
+    .btn:hover::after { transform: translateX(0); }
+    .btn:hover { color: var(--bg); }
+
+    .btn-primary {
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .btn-primary::after { background: var(--gold); }
+
+    .btn-outline {
+      color: var(--text-dim);
+      border-color: var(--text-dim);
+    }
+
+    .btn-outline::after { background: var(--text-dim); }
+
+    /* ─── ID Card ─── */
+    .id-card {
+      position: relative;
+      background: linear-gradient(135deg, #0d1020 0%, #141828 100%);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 12px;
+      padding: 1.8rem;
+      box-shadow:
+        0 0 40px rgba(201,162,39,0.08),
+        0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .id-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(201,162,39,0.4), transparent 50%, rgba(0,204,255,0.15));
+      z-index: -1;
+    }
+
+    .id-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid rgba(201,162,39,0.2);
+    }
+
+    .id-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .id-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      color: var(--gold-dim);
+      opacity: 0.6;
+    }
+
+    .id-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #1a1f35, #0a0c18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .id-avatar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(201,162,39,0.1), transparent);
+    }
+
+    .id-rows { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .id-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+    }
+
+    .id-row-key {
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .id-row-val {
+      color: var(--text);
+      letter-spacing: 0.05em;
+      text-align: right;
+    }
+
+    .id-row-val.classified {
+      color: var(--red);
+      letter-spacing: 0.15em;
+    }
+
+    .id-barcode {
+      margin-top: 1.2rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(201,162,39,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .barcode-lines {
+      display: flex;
+      gap: 2px;
+      height: 28px;
+    }
+
+    .barcode-lines span {
+      background: var(--gold-dim);
+      width: 2px;
+      opacity: 0.6;
+    }
+
+    .barcode-lines span:nth-child(even) { width: 1px; opacity: 0.3; }
+    .barcode-lines span:nth-child(3n) { width: 3px; }
+
+    .barcode-num {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      letter-spacing: 0.3em;
+    }
+
+    /* ─── Section shared ─── */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .section-pad { padding: 6rem 0; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .section-number {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(201,162,39,0.3), transparent);
+    }
+
+    /* ─── Dossier / Profile ─── */
+    .dossier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .dossier-card {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .dossier-card:hover {
+      border-color: rgba(201,162,39,0.35);
+      transform: translateY(-2px);
+    }
+
+    .dossier-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    .dossier-card-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .dossier-card-value {
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .dossier-card-value.accent { color: var(--gold); }
+
+    /* ─── Skills ─── */
+    .skills-list { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .skill-item {}
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .skill-level {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold);
+    }
+
+    .skill-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .skill-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .skill-fill.animate { transform: scaleX(1); }
+
+    /* ─── Operations ─── */
+    .ops-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .op-card {
+      background: var(--bg2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      padding: 1.8rem 1.5rem;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .op-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .op-card:hover::after { transform: scaleX(1); }
+
+    .op-card:hover { border-color: rgba(201,162,39,0.2); }
+
+    .op-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .op-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.4rem;
+    }
+
+    .op-status {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .op-desc {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ─── Quote ─── */
+    .quote-section {
+      background: var(--bg2);
+      border-top: 1px solid rgba(201,162,39,0.1);
+      border-bottom: 1px solid rgba(201,162,39,0.1);
+    }
+
+    .quote-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+
+    .quote-mark {
+      font-family: 'Orbitron', monospace;
+      font-size: 4rem;
+      color: var(--gold);
+      opacity: 0.15;
+      line-height: 0.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .quote-text {
+      font-size: 1.25rem;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.8;
+      letter-spacing: 0.02em;
+    }
+
+    .quote-author {
+      margin-top: 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Typewriter ─── */
+    .typewriter {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid var(--gold);
+      width: 0;
+      animation: type 3s steps(40) 0.5s forwards, blink 0.9s infinite;
+    }
+
+    @keyframes type {
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      position: relative;
+      z-index: 1;
+      padding: 2rem 3rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-right {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      opacity: 0.5;
+    }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--gold-dim);
+      border-radius: 3px;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .id-card { max-width: 320px; margin: 0 auto; }
+      .dossier-grid { grid-template-columns: 1fr; }
+      .ops-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">W.I.S.E · FIELD AGENT</a>
+  <ul class="nav-links">
+    <li><a href="#profile">Profile</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#operations">Operations</a></li>
+  </ul>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    ACTIVE
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="hero-tag">// W.I.S.E — CLASSIFIED PERSONNEL FILE //</p>
+      <h1 class="hero-name">
+        <span class="glitch" data-text="LOID FORGER">LOID FORGER</span>
+        <span class="twilight">[ TWILIGHT ]</span>
+      </h1>
+      <p class="hero-desc">
+        The world's greatest <strong>spy</strong>. Psychiatrist by day,
+        <strong>WISE field operative</strong> by night. Leader of Team Anya and
+        architect of <strong>Operation Strix</strong> — a mission to prevent war
+        through an impossible family.
+      </p>
+      <div class="hero-cta">
+        <a href="#profile" class="btn btn-primary">VIEW DOSSIER</a>
+        <a href="#operations" class="btn btn-outline">FIELD OPS</a>
+      </div>
+    </div>
+    <div>
+      <!-- ID Card -->
+      <div class="id-card">
+        <div class="id-card-header">
+          <span class="id-label">W.I.S.E IDENTIFICATION</span>
+          <span class="id-logo">AGENT</span>
+        </div>
+        <div class="id-avatar">🕵️</div>
+        <div class="id-rows">
+          <div class="id-row">
+            <span class="id-row-key">CODENAME</span>
+            <span class="id-row-val accent">TWILIGHT</span>
+          </div>
+          <div class="id-row">
+            <span class="id-row-key">COVER ID</span>
+            <span class="id-row-val">LOID FORGER</span>
+          </div>
+          <div class="id-row">
+            <span class="id-row-key">COVER ROLE</span>
+            <span class="id-row-val">PSYCHIATRIST</span>
+          </div>
+          <div class="id-row">
+            <span class="id-row-key">CLEARANCE</span>
+            <span class="id-row-val accent">LEVEL — OMEGA</span>
+          </div>
+          <div class="id-row">
+            <span class="id-row-key">REAL NAME</span>
+            <span class="id-row-val classified">CLASSIFIED</span>
+          </div>
+          <div class="id-row">
+            <span class="id-row-key">STATUS</span>
+            <span class="id-row-val" style="color:#2ec44d">● ACTIVE</span>
+          </div>
+        </div>
+        <div class="id-barcode">
+          <div class="barcode-lines">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span class="barcode-num">WISE·TW·0047·8831·STRIX</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE / DOSSIER -->
+<section id="profile" class="section-pad" style="background: var(--bg2);">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-number">01 //</span>
+      <h2 class="section-title">Operative Profile</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="dossier-grid">
+      <div class="dossier-card">
+        <div class="dossier-card-label">Mission Role</div>
+        <div class="dossier-card-value accent">Team Leader · ANYA</div>
+      </div>
+      <div class="dossier-card">
+        <div class="dossier-card-label">Organization</div>
+        <div class="dossier-card-value">W.I.S.E (Western-aligned Intelligence Service of Eisenberg)</div>
+      </div>
+      <div class="dossier-card">
+        <div class="dossier-card-label">Cover Occupation</div>
+        <div class="dossier-card-value">Psychiatrist · Berlint General Hospital</div>
+      </div>
+      <div class="dossier-card">
+        <div class="dossier-card-label">Field Specialty</div>
+        <div class="dossier-card-value">Infiltration · Disguise · Human Intelligence</div>
+      </div>
+      <div class="dossier-card">
+        <div class="dossier-card-label">Known Aliases</div>
+        <div class="dossier-card-value">Twilight · Loid Forger · Karl Beaker · 12+ cover identities</div>
+      </div>
+      <div class="dossier-card">
+        <div class="dossier-card-label">Primary Mission</div>
+        <div class="dossier-card-value accent">Operation Strix</div>
+      </div>
+      <div class="dossier-card" style="grid-column: 1 / -1;">
+        <div class="dossier-card-label">Operative Summary</div>
+        <div class="dossier-card-value" style="font-weight: 400; line-height: 1.9; color: var(--text-dim);">
+          TWILIGHT is WISE's most decorated field agent — a once-ordinary youth
+          who survived the ruins of war and became the perfect spy. He can adopt any persona,
+          speaks 7+ languages, excels at psychology, combat, and improvisation.
+          Assigned to assemble a temporary family for Operation Strix,
+          he adopted a child telepath (Anya) and entered a sham marriage with
+          a contract assassin (Yor Briar). Unexpectedly, the mission may be changing him.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-number">02 //</span>
+      <h2 class="section-title">Operative Skills</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="skills-list">
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Infiltration & Disguise</span>
+          <span class="skill-level">MAX</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="--w: 1" data-pct="1"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Close Combat & Marksmanship</span>
+          <span class="skill-level">99%</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" data-pct="0.99"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Psychology & Manipulation</span>
+          <span class="skill-level">98%</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" data-pct="0.98"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Multilingual (7+ languages)</span>
+          <span class="skill-level">95%</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" data-pct="0.95"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Tactical Planning</span>
+          <span class="skill-level">97%</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" data-pct="0.97"></div>
+        </div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-header">
+          <span class="skill-name">Parenting (Under Development)</span>
+          <span class="skill-level">62%</span>
+        </div>
+        <div class="skill-bar">
+          <div class="skill-fill" style="background: linear-gradient(90deg, #2a5ab5, #4a8af5);" data-pct="0.62"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <div class="quote-inner">
+    <div class="quote-mark">"</div>
+    <p class="quote-text typewriter">
+      All of humanity's wars, conflicts and hatred are born from the failures to communicate.
+    </p>
+    <p class="quote-author">— TWILIGHT · Field Note Classified</p>
+  </div>
+</section>
+
+<!-- OPERATIONS -->
+<section id="operations" class="section-pad" style="background: var(--bg2);">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-number">03 //</span>
+      <h2 class="section-title">Active Operations</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="ops-grid">
+      <div class="op-card">
+        <span class="op-icon">🎭</span>
+        <div class="op-name">STRIX</div>
+        <div class="op-status">● ONGOING</div>
+        <p class="op-desc">Infiltrate Eden Academy social circle through manufactured family cover. Target: Donovan Desmond.</p>
+      </div>
+      <div class="op-card">
+        <span class="op-icon">🏫</span>
+        <div class="op-name">EDEN COVER</div>
+        <div class="op-status">● ACTIVE</div>
+        <p class="op-desc">Anya Forger enrolled at Eden Academy. Stellar student award required for Loid's access to target.</p>
+      </div>
+      <div class="op-card">
+        <span class="op-icon">🕊️</span>
+        <div class="op-name">PEACE KEEP</div>
+        <div class="op-status">● STANDING</div>
+        <p class="op-desc">Maintain West–East ceasefire through intelligence operations. Ultimate objective: prevent the next world war.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    W.I.S.E · EASTERN DIVISION · FILE REF: TW-0047
+  </div>
+  <div class="footer-right">
+    THIS DOCUMENT IS CLASSIFIED. UNAUTHORIZED ACCESS IS PUNISHABLE UNDER SECTION 7 OF THE ESPIONAGE ACT.
+  </div>
+</footer>
+
+<script>
+// ─── Particle Field ───
+(function() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function createParticles() {
+    particles = [];
+    const count = Math.floor(W * H / 14000);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: rand(0, W),
+        y: rand(0, H),
+        r: rand(0.5, 2),
+        vx: rand(-0.12, 0.12),
+        vy: rand(-0.2, -0.05),
+        alpha: rand(0.1, 0.5)
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201,162,39,${p.alpha})`;
+      ctx.fill();
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < -5) { p.y = H + 5; p.x = rand(0, W); }
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); createParticles(); });
+  resize();
+  createParticles();
+  draw();
+})();
+
+// ─── Skill bar animation on scroll ───
+(function() {
+  const fills = document.querySelectorAll('.skill-fill');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const pct = parseFloat(e.target.dataset.pct) || 1;
+        e.target.style.transform = `scaleX(${pct})`;
+        e.target.classList.add('animate');
+      }
+    });
+  }, { threshold: 0.2 });
+  fills.forEach(f => observer.observe(f));
+})();
+
+// ─── Glitch random trigger ───
+(function() {
+  const el = document.querySelector('.glitch');
+  if (!el) return;
+  function triggerGlitch() {
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = '';
+    setTimeout(triggerGlitch, 4000 + Math.random() * 6000);
+  }
+  setTimeout(triggerGlitch, 3000);
+})();
+</script>
+</body>
+</html>
